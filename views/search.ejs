@@ -4,11 +4,11 @@
   <div class="search-summary-bar">
     <div class="summary-item">
       <span class="label">Check-In</span>
-      <span class="value"><%= new Date().toLocaleDateString('en-KE', { dateStyle: 'medium' }) %></span>
+      <span class="value"><%= new Date(checkIn).toLocaleDateString('en-KE', { dateStyle: 'medium' }) %></span>
     </div>
     <div class="summary-item">
       <span class="label">Check-Out</span>
-      <span class="value"><%= new Date().toLocaleDateString('en-KE', { dateStyle: 'medium' }) %></span>
+      <span class="value"><%= new Date(checkOut).toLocaleDateString('en-KE', { dateStyle: 'medium' }) %></span>
     </div>
     <div class="summary-item">
       <span class="label">Duration</span>

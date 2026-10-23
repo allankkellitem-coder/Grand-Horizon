@@ -1,8 +1,8 @@
-CREATE DATABASE IF NOT EXISTS grand_horizon;
-USE grand_horizon;
+CREATE DATABASE IF NOT EXISTS grandhorizon;
+USE grandhorizon;
 
 -- Core User Schema for Internal System Roles
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
@@ -13,14 +13,14 @@ CREATE TABLE users (
 );
 
 -- Hotel Inventory Tables
-CREATE TABLE room_categories (
+CREATE TABLE IF NOT EXISTS room_categories (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     description TEXT,
     base_price_kes NUMERIC(12, 2) NOT NULL
 );
 
-CREATE TABLE rooms (
+CREATE TABLE IF NOT EXISTS rooms (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     room_number VARCHAR(10) UNIQUE NOT NULL,
     category_id BIGINT UNSIGNED,
@@ -30,7 +30,7 @@ CREATE TABLE rooms (
     CONSTRAINT chk_room_status CHECK (status IN ('Available', 'Housekeeping', 'Maintenance'))
 );
 
-CREATE TABLE hotel_services (
+CREATE TABLE IF NOT EXISTS hotel_services (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     service_name VARCHAR(100) NOT NULL,
     description TEXT,
@@ -38,7 +38,7 @@ CREATE TABLE hotel_services (
 );
 
 -- Reservation Tables
-CREATE TABLE bookings (
+CREATE TABLE IF NOT EXISTS bookings (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     confirmation_code VARCHAR(12) UNIQUE NOT NULL,
     guest_name VARCHAR(100) NOT NULL,
@@ -57,7 +57,7 @@ CREATE TABLE bookings (
 );
 
 -- Many-to-Many Bridge Table for Booking Services Add-ons
-CREATE TABLE booking_services (
+CREATE TABLE IF NOT EXISTS booking_services (
     booking_id BIGINT UNSIGNED,
     service_id BIGINT UNSIGNED,
     quantity INT DEFAULT 1,
@@ -71,8 +71,7 @@ INSERT INTO room_categories (name, description, base_price_kes) VALUES
 ('High-Altitude Athlete Cabin', 'Custom-built cabin with high-altitude recovery environment, hypoxia simulation training options, and direct access to athletic running tracks in Eldoret.', 8000.00),
 ('Executive Business Suite', 'Premium corporate suite designed for business travelers visiting the Uasin Gishu County offices, featuring a dedicated high-speed workstation and board meeting options.', 15000.00),
 ('Deluxe Safari Room', 'Beautifully designed room featuring authentic Kenyan safari styling, natural earth tones, views of the sunset hills, and supreme premium relaxation.', 10000.00),
-('Standard Horizon Twin', 'Comfortable and affordable stay with high-speed internet, premium twin bedding, and a complimentary local tea basket.', 6000.00)
- -- MySQL equivalent to ON CONFLICT DO NOTHING (if a unique key exists)
+('Standard Horizon Twin', 'Comfortable and affordable stay with high-speed internet, premium twin bedding, and a complimentary local tea basket.', 6000.00);
 
 -- Seed Rooms
 INSERT INTO rooms (room_number, category_id, floor, status) VALUES
@@ -92,8 +91,15 @@ INSERT INTO hotel_services (service_name, description, price_kes) VALUES
 ('High-Altitude Gym Access', 'Full access to our high-performance specialized gym equipped with athletic training tools, altitude chambers, and customized running assessments.', 1500.00),
 ('Traditional Kalenjin Dinner Package', 'An authentic Kenyan culinary experience featuring a selection of local proteins, maize-meal ugali, local greens, and traditional fresh Mursik (fermented milk).', 2500.00),
 ('Uasin Gishu County Office Shuttle & Business Kit', 'Private transport to/from County Assembly and Town Hall offices, plus a printed Uasin Gishu travel & business handbook and notebook kit.', 4000.00),
-('Daily Horizon Buffet (Mursik & Continental)', 'Indulge in a premium daily breakfast and brunch buffet with standard continental treats and our signature Eldoret-style local teas and fresh Mursik.', 1200.00)
+('Daily Horizon Buffet (Mursik & Continental)', 'Indulge in a premium daily breakfast and brunch buffet with standard continental treats and our signature Eldoret-style local teas and fresh Mursik.', 1200.00);
 
--- Seed Initial Admin User (Adjusted 'Admin' role case to match the CHECK constraint lower-case 'admin')
+-- Seed Users (1 Admin + 6 Team Members with password "1177")
 INSERT INTO users (name, email, password_hash, role) VALUES
-('Ian kipkoech', 'ian@gmail.com', '$2b$10$wWuAbpyykyPiXkWT01dwteUzKoQ1eEgRk81eEIa1m8MI9eo/F42v2', 'admin')
+('Allan', 'allan@gmail.com', '$2b$10$M7toEGlGSelXjyvnHq0QJ.4J2cdFY89.LLDiAqds7Ij4R6aJFhIXq', 'admin'),
+('Frank Koech', 'frank@gmail.com', '$2b$10$M7toEGlGSelXjyvnHq0QJ.4J2cdFY89.LLDiAqds7Ij4R6aJFhIXq', 'staff'),
+('Faith Kipyegon', 'faith@gmail.com', '$2b$10$M7toEGlGSelXjyvnHq0QJ.4J2cdFY89.LLDiAqds7Ij4R6aJFhIXq', 'staff'),
+('Eliud Kipchoge', 'eliud@gmail.com', '$2b$10$M7toEGlGSelXjyvnHq0QJ.4J2cdFY89.LLDiAqds7Ij4R6aJFhIXq', 'staff'),
+('Brenda Chebet', 'brenda@gmail.com', '$2b$10$M7toEGlGSelXjyvnHq0QJ.4J2cdFY89.LLDiAqds7Ij4R6aJFhIXq', 'staff'),
+('David Rudisha', 'david@gmail.com', '$2b$10$M7toEGlGSelXjyvnHq0QJ.4J2cdFY89.LLDiAqds7Ij4R6aJFhIXq', 'staff'),
+('Mercy Cherono', 'mercy@gmail.com', '$2b$10$M7toEGlGSelXjyvnHq0QJ.4J2cdFY89.LLDiAqds7Ij4R6aJFhIXq', 'staff')
+ON DUPLICATE KEY UPDATE name=VALUES(name), password_hash=VALUES(password_hash), role=VALUES(role);
