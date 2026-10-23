@@ -1,0 +1,62 @@
+<%- include('header') %>
+
+<div class="page-container">
+  <div class="search-summary-bar">
+    <div class="summary-item">
+      <span class="label">Check-In</span>
+      <span class="value"><%= new Date().toLocaleDateString('en-KE', { dateStyle: 'medium' }) %></span>
+    </div>
+    <div class="summary-item">
+      <span class="label">Check-Out</span>
+      <span class="value"><%= new Date().toLocaleDateString('en-KE', { dateStyle: 'medium' }) %></span>
+    </div>
+    <div class="summary-item">
+      <span class="label">Duration</span>
+      <span class="value"><%= nights %> <%= nights === 1 ? 'Night' : 'Nights' %></span>
+    </div>
+    <a href="/#booking-console" class="modify-search-link">✏️ Modify Search</a>
+  </div>
+
+  <section class="search-results-section">
+    <h2>Available Accommodations</h2>
+    <div class="accent-bar"></div>
+
+    <% if (Object.keys(categoriesGrouped).length === 0) { %>
+      <div class="no-results-box">
+        <h3>😔 No Rooms Available</h3>
+        <p>We are fully booked or undergoing housekeeping for these dates. Please try selecting a different date range or category.</p>
+        <a href="/#booking-console" class="btn-solid search-again-btn">Try New Dates</a>
+      </div>
+    <% } else { %>
+      <div class="categories-list">
+        <% Object.keys(categoriesGrouped).forEach(key => { %>
+          <% const group = categoriesGrouped[key]; %>
+          <div class="result-category-block">
+            <div class="result-category-details">
+              <div class="result-badge">Available Option</div>
+              <h3><%= group.name %></h3>
+              <p class="result-price">KES <%= parseFloat(group.base_price_kes).toLocaleString() %> <span class="per-night">/ night</span></p>
+              <p class="result-desc"><%= group.description %></p>
+            </div>
+
+            <div class="available-rooms-grid">
+              <% group.rooms.forEach(room => { %>
+                <div class="room-selector-card">
+                  <div class="room-number-tag">Room <%= room.room_number %></div>
+                  <p class="room-floor-tag">Floor <%= room.floor %></p>
+                  <p class="room-price-calc">
+                    Total stay base charge: <br>
+                    <strong>KES <%= (parseFloat(group.base_price_kes) * nights).toLocaleString() %></strong>
+                  </p>
+                  <a href="/book?room_id=<%= room.id %>&checkIn=<%= checkIn %>&checkOut=<%= checkOut %>" class="btn-solid book-now-btn">Select Room <%= room.room_number %></a>
+                </div>
+              <% }) %>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </section>
+</div>
+
+<%- include('footer') %>

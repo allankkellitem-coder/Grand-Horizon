@@ -1,0 +1,165 @@
+<%- include('header') %>
+
+<div class="dashboard-layout">
+  <%- include('sidebar') %>
+
+  <main class="dashboard-content">
+    <div class="dashboard-header-bar">
+      <div>
+        <h1>Hotel Rooms Master CRUD</h1>
+        <p class="subtitle">Manage individual room designations, categorize stays, assign floors, and toggle service statuses.</p>
+      </div>
+    </div>
+
+    <% if (error) { %>
+      <div class="alert-message error-message">
+        ⚠️ <%= error %>
+      </div>
+    <% } %>
+
+    <div class="crud-grid">
+      <!-- Left Column: Rooms List & Editing -->
+      <div class="crud-list-panel">
+        <h3>Existing Physical Rooms</h3>
+        <div class="accent-bar-left"></div>
+
+        <% if (rooms.length === 0) { %>
+          <div class="empty-state-box">No individual rooms created. Add rooms using the form panel on the right.</div>
+        <% } else { %>
+          <div class="table-responsive-container">
+            <table class="responsive-table">
+              <thead>
+                <tr>
+                  <th>Room No.</th>
+                  <th>Category</th>
+                  <th>Floor</th>
+                  <th>Status</th>
+                  <th>Operations</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% rooms.forEach(room => { %>
+                  <tr>
+                    <td data-label="Room No."><strong><%= room.room_number %></strong></td>
+                    <td data-label="Category"><%= room.category_name %></td>
+                    <td data-label="Floor">Floor <%= room.floor %></td>
+                    <td data-label="Status">
+                      <span class="status-pill status-<%= room.status.toLowerCase() %>">
+                        <%= room.status %>
+                      </span>
+                    </td>
+                    <td data-label="Operations">
+                      <div class="operation-buttons-row">
+                        <button type="button" class="btn-outline btn-xs" onclick="toggleEditRoom(<%= room.id %>)">✏️ Edit</button>
+                        <form action="/dashboard/rooms/<%= room.id %>/delete" method="POST" class="inline-form" onsubmit="return confirm('Are you sure you want to delete Room <%= room.room_number %>?')">
+                          <button type="submit" class="btn-outline btn-xs btn-danger">🗑️ Delete</button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <!-- Hidden Editing Row for each room -->
+                  <tr id="edit-row-<%= room.id %>" style="display: none;" class="edit-form-tr">
+                    <td colspan="5">
+                      <form action="/dashboard/rooms/<%= room.id %>" method="POST" class="crud-inline-edit-form">
+                        <div class="form-row-multi">
+                          <div class="form-field-sm">
+                            <label>Room Number</label>
+                            <input type="text" name="room_number" value="<%= room.room_number %>" required>
+                          </div>
+                          
+                          <div class="form-field-sm">
+                            <label>Category</label>
+                            <select name="category_id" required>
+                              <% categories.forEach(cat => { %>
+                                <option value="<%= cat.id %>" <%= cat.id === room.category_id ? 'selected' : '' %>>
+                                  <%= cat.name %>
+                                </option>
+                              <% }) %>
+                            </select>
+                          </div>
+
+                          <div class="form-field-sm">
+                            <label>Floor</label>
+                            <input type="number" name="floor" value="<%= room.floor %>" required>
+                          </div>
+
+                          <div class="form-field-sm">
+                            <label>Status</label>
+                            <select name="status" required>
+                              <option value="Available" <%= room.status === 'Available' ? 'selected' : '' %>>Available</option>
+                              <option value="Housekeeping" <%= room.status === 'Housekeeping' ? 'selected' : '' %>>Housekeeping</option>
+                              <option value="Maintenance" <%= room.status === 'Maintenance' ? 'selected' : '' %>>Maintenance</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="edit-actions-row">
+                          <button type="submit" class="btn-solid btn-sm">Save Room</button>
+                          <button type="button" class="btn-outline btn-sm" onclick="toggleEditRoom(<%= room.id %>)">Cancel</button>
+                        </div>
+                      </form>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- Right Column: Add New Room Panel -->
+      <div class="crud-form-panel">
+        <div class="form-sticky-card">
+          <h3>Create New Room</h3>
+          <div class="accent-bar-left"></div>
+
+          <form action="/dashboard/rooms" method="POST" class="crud-main-form">
+            <div class="form-field">
+              <label for="new_room_number">Room Number *</label>
+              <input type="text" id="new_room_number" name="room_number" required placeholder="e.g. 104">
+            </div>
+
+            <div class="form-field">
+              <label for="new_category_id">Room Category *</label>
+              <select id="new_category_id" name="category_id" required>
+                <option value="" disabled selected>Select category...</option>
+                <% categories.forEach(cat => { %>
+                  <option value="<%= cat.id %>"><%= cat.name %> (KES <%= parseFloat(cat.base_price_kes).toLocaleString() %>)</option>
+                <% }) %>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="new_floor">Floor Assignment *</label>
+              <input type="number" id="new_floor" name="floor" required placeholder="e.g. 1">
+            </div>
+
+            <div class="form-field">
+              <label for="new_status">Baseline Status *</label>
+              <select id="new_status" name="status" required>
+                <option value="Available" selected>Available</option>
+                <option value="Housekeeping">Housekeeping</option>
+                <option value="Maintenance">Maintenance</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn-solid block-btn">Add Room Entry</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  function toggleEditRoom(id) {
+    const row = document.getElementById('edit-row-' + id);
+    if (row.style.display === 'none') {
+      row.style.display = 'table-row';
+    } else {
+      row.style.display = 'none';
+    }
+  }
+</script>
+
+<%- include('footer') %>

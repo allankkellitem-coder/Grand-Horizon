@@ -1,0 +1,116 @@
+<%- include('header') %>
+
+<div class="dashboard-layout">
+  <%- include('../sidebar') %>
+
+  <main class="dashboard-content">
+    <div class="dashboard-header-bar">
+      <div>
+        <h1>Inventory Categories Manager</h1>
+        <p class="subtitle">Define hotel room types, base capacities, descriptions, and baseline KES pricing.</p>
+      </div>
+    </div>
+
+    <% if (error) { %>
+      <div class="alert-message error-message">
+        ⚠️ <%= error %>
+      </div>
+    <% } %>
+
+    <div class="crud-grid">
+      <!-- Left Column: Existing Categories List & Edit Forms -->
+      <div class="crud-list-panel">
+        <h3>Existing Room Categories</h3>
+        <div class="accent-bar-left"></div>
+
+        <% if (categories.length === 0) { %>
+          <div class="empty-state-box">No room categories exist. Use the creation panel to add one.</div>
+        <% } else { %>
+          <div class="category-cards-stack">
+            <% categories.forEach(cat => { %>
+              <div class="crud-item-card">
+                <div class="crud-item-header">
+                  <h4><%= cat.name %></h4>
+                  <span class="price-tag-sm">KES <%= parseFloat(cat.base_price_kes).toLocaleString() %> / night</span>
+                </div>
+                <p class="item-desc"><%= cat.description %></p>
+                
+                <div class="item-operations-container">
+                  <!-- Toggle Edit Form Button -->
+                  <button type="button" class="btn-outline btn-xs" onclick="toggleEditForm(<%= cat.id %>)">✏️ Edit</button>
+                  
+                  <!-- Delete Form -->
+                  <form action="/dashboard/categories/<%= cat.id %>/delete" method="POST" class="inline-form" onsubmit="return confirm('Are you sure you want to delete this category?')">
+                    <button type="submit" class="btn-outline btn-xs btn-danger">🗑️ Delete</button>
+                  </form>
+                </div>
+
+                <!-- Hidden Inline Edit Form -->
+                <div class="inline-edit-form-box" id="edit-form-<%= cat.id %>" style="display: none;">
+                  <form action="/dashboard/categories/<%= cat.id %>" method="POST" class="crud-form-layout">
+                    <div class="form-field">
+                      <label for="name_<%= cat.id %>">Category Name</label>
+                      <input type="text" id="name_<%= cat.id %>" name="name" value="<%= cat.name %>" required>
+                    </div>
+                    <div class="form-field">
+                      <label for="price_<%= cat.id %>">Base Price (KES)</label>
+                      <input type="number" id="price_<%= cat.id %>" name="base_price_kes" value="<%= cat.base_price_kes %>" step="0.01" required>
+                    </div>
+                    <div class="form-field">
+                      <label for="desc_<%= cat.id %>">Description</label>
+                      <textarea id="desc_<%= cat.id %>" name="description" rows="3" required><%= cat.description %></textarea>
+                    </div>
+                    <div class="edit-actions-row">
+                      <button type="submit" class="btn-solid btn-sm">Save Changes</button>
+                      <button type="button" class="btn-outline btn-sm" onclick="toggleEditForm(<%= cat.id %>)">Cancel</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- Right Column: Create New Category Form Card -->
+      <div class="crud-form-panel">
+        <div class="form-sticky-card">
+          <h3>Create New Category</h3>
+          <div class="accent-bar-left"></div>
+
+          <form action="/dashboard/categories" method="POST" class="crud-main-form">
+            <div class="form-field">
+              <label for="new_name">Category Name *</label>
+              <input type="text" id="new_name" name="name" required placeholder="e.g. Standard Horizon Twin">
+            </div>
+
+            <div class="form-field">
+              <label for="new_price">Base Rate (KES) *</label>
+              <input type="number" id="new_price" name="base_price_kes" step="0.01" required placeholder="e.g. 6000.00">
+            </div>
+
+            <div class="form-field">
+              <label for="new_desc">Description *</label>
+              <textarea id="new_desc" name="description" rows="4" required placeholder="Describe room amenities, local styling, and features..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-solid block-btn">Create Category</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  function toggleEditForm(id) {
+    const form = document.getElementById('edit-form-' + id);
+    if (form.style.display === 'none') {
+      form.style.display = 'block';
+    } else {
+      form.style.display = 'none';
+    }
+  }
+</script>
+
+<%- include('footer') %>

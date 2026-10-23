@@ -1,0 +1,91 @@
+<%- include('header') %>
+
+<div class="page-container small-container">
+  <div class="success-card">
+    <div class="success-icon">⚜</div>
+    <h2>Reservation Confirmed!</h2>
+    <p class="success-message-sub">Thank you for choosing Grand Horizon Hotel in Eldoret. Your booking has been processed successfully.</p>
+    
+    <div class="code-box">
+      <span class="code-label">CONFIRMATION CODE</span>
+      <span class="code-value"><%= confirmation_code %></span>
+    </div>
+
+    <div class="receipt-section">
+      <h3>Stay Details</h3>
+      <table class="receipt-table">
+        <tr>
+          <td><strong>Guest Name:</strong></td>
+          <td class="text-right"><%= guest_name %></td>
+        </tr>
+        <tr>
+          <td><strong>Guest Email:</strong></td>
+          <td class="text-right"><%= guest_email %></td>
+        </tr>
+        <tr>
+          <td><strong>Phone Number:</strong></td>
+          <td class="text-right"><%= guest_phone %></td>
+        </tr>
+        <tr>
+          <td><strong>ID/Passport:</strong></td>
+          <td class="text-right"><%= guest_id_passport %></td>
+        </tr>
+        <tr>
+          <td><strong>Room Number:</strong></td>
+          <td class="text-right">Room <%= room_number %></td>
+        </tr>
+        <tr>
+          <td><strong>Check-In Date:</strong></td>
+          <td class="text-right"><%= new Date(checkIn).toLocaleDateString('en-KE', { dateStyle: 'medium' }) %></td>
+        </tr>
+        <tr>
+          <td><strong>Check-Out Date:</strong></td>
+          <td class="text-right"><%= new Date(checkOut).toLocaleDateString('en-KE', { dateStyle: 'medium' }) %></td>
+        </tr>
+        <tr>
+          <td><strong>Stay Duration:</strong></td>
+          <td class="text-right"><%= nights %> <%= nights === 1 ? 'Night' : 'Nights' %></td>
+        </tr>
+      </table>
+    </div>
+
+    <% if (selectedServices.length > 0) { %>
+      <div class="receipt-section">
+        <h3>Premium Services Included</h3>
+        <table class="receipt-table">
+          <% selectedServices.forEach(s => { %>
+            <tr>
+              <td><%= s.name %> (Qty: <%= s.qty %>)</td>
+              <td class="text-right">KES <%= (s.price * s.qty).toLocaleString() %></td>
+            </tr>
+          <% }) %>
+        </table>
+      </div>
+    <% } %>
+
+    <div class="receipt-section final-total-section">
+      <h3>Billing Summary</h3>
+      <table class="receipt-table">
+        <tr>
+          <td>Room Base Total (<%= nights %> nights):</td>
+          <td class="text-right">KES <%= roomTotal.toLocaleString() %></td>
+        </tr>
+        <tr>
+          <td>Services Total:</td>
+          <td class="text-right">KES <%= servicesTotal.toLocaleString() %></td>
+        </tr>
+        <tr class="grand-total-row">
+          <td><strong>Grand Total Paid/Owed (KES):</strong></td>
+          <td class="text-right"><strong>KES <%= grandTotal.toLocaleString() %></strong></td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="actions-row">
+      <a href="/" class="btn-solid home-btn">Return to Home</a>
+      <button onclick="window.print()" class="btn-outline print-btn">🖨 Print Receipt</button>
+    </div>
+  </div>
+</div>
+
+<%- include('footer') %>

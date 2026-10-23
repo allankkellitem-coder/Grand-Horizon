@@ -1,0 +1,113 @@
+<%- include('header') %>
+
+<div class="dashboard-layout">
+  <%- include('sidebar') %>
+
+  <main class="dashboard-content">
+    <div class="dashboard-header-bar">
+      <div>
+        <h1>Add-on Services CRUD Manager</h1>
+        <p class="subtitle">Edit localized service add-ons, set pricing, and write engaging hospitality packages.</p>
+      </div>
+    </div>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert-message error-message">
+        ⚠️ <%= error %>
+      </div>
+    <% } %>
+
+    <div class="crud-grid">
+      <!-- Left Column: Services stack and edit forms -->
+      <div class="crud-list-panel">
+        <h3>Baseline Guest Packages</h3>
+        <div class="accent-bar-left"></div>
+
+        <% if (services.length === 0) { %>
+          <div class="empty-state-box">No additional hotel services configured. Use the form panel to add service packages.</div>
+        <% } else { %>
+          <div class="category-cards-stack">
+            <% services.forEach(serv => { %>
+              <div class="crud-item-card">
+                <div class="crud-item-header">
+                  <h4><%= serv.service_name %></h4>
+                  <span class="price-tag-sm">KES <%= parseFloat(serv.price_kes).toLocaleString() %></span>
+                </div>
+                <p class="item-desc"><%= serv.description %></p>
+                
+                <div class="item-operations-container">
+                  <button type="button" class="btn-outline btn-xs" onclick="toggleEditService(<%= serv.id %>)">✏️ Edit Package</button>
+                  <form action="/dashboard/services/<%= serv.id %>/delete" method="POST" class="inline-form" onsubmit="return confirm('Are you sure you want to delete this service?')">
+                    <button type="submit" class="btn-outline btn-xs btn-danger">🗑️ Remove</button>
+                  </form>
+                </div>
+
+                <!-- Hidden Inline Edit Service Form -->
+                <div class="inline-edit-form-box" id="edit-service-<%= serv.id %>" style="display: none;">
+                  <form action="/dashboard/services/<%= serv.id %>" method="POST" class="crud-form-layout">
+                    <div class="form-field">
+                      <label for="name_<%= serv.id %>">Service/Package Name</label>
+                      <input type="text" id="name_<%= serv.id %>" name="service_name" value="<%= serv.service_name %>" required>
+                    </div>
+                    <div class="form-field">
+                      <label for="price_<%= serv.id %>">Rate (KES)</label>
+                      <input type="number" id="price_<%= serv.id %>" name="price_kes" value="<%= serv.price_kes %>" step="0.01" required>
+                    </div>
+                    <div class="form-field">
+                      <label for="desc_<%= serv.id %>">Package Description</label>
+                      <textarea id="desc_<%= serv.id %>" name="description" rows="3" required><%= serv.description %></textarea>
+                    </div>
+                    <div class="edit-actions-row">
+                      <button type="submit" class="btn-solid btn-sm">Save Service</button>
+                      <button type="button" class="btn-outline btn-sm" onclick="toggleEditService(<%= serv.id %>)">Cancel</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- Right Column: Add New Service Panel -->
+      <div class="crud-form-panel">
+        <div class="form-sticky-card">
+          <h3>Create Service Package</h3>
+          <div class="accent-bar-left"></div>
+
+          <form action="/dashboard/services" method="POST" class="crud-main-form">
+            <div class="form-field">
+              <label for="new_service_name">Service Name *</label>
+              <input type="text" id="new_service_name" name="service_name" required placeholder="e.g. Traditional Kalenjin Dinner Package">
+            </div>
+
+            <div class="form-field">
+              <label for="new_price">Price (KES) *</label>
+              <input type="number" id="new_price" name="price_kes" step="0.01" required placeholder="e.g. 2500.00">
+            </div>
+
+            <div class="form-field">
+              <label for="new_desc">Description *</label>
+              <textarea id="new_desc" name="description" rows="4" required placeholder="Outline shuttle transport details, traditional meals like Mursik, or specialized trainer hours..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-solid block-btn">Create Service</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  function toggleEditService(id) {
+    const form = document.getElementById('edit-service-' + id);
+    if (form.style.display === 'none') {
+      form.style.display = 'block';
+    } else {
+      form.style.display = 'none';
+    }
+  }
+</script>
+
+<%- include('footer') %>

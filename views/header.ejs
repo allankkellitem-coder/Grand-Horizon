@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grand Horizon Hotel | Eldoret, Kenya</title>
+  
+  <!-- Premium Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Core Design System stylesheet -->
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-container">
+      <a href="/" class="logo-area">
+        <span class="logo-symbol">⚜</span>
+        <div class="logo-text">
+          <span class="logo-brand">Grand Horizon</span>
+          <span class="logo-tagline">Eldoret, Kenya</span>
+        </div>
+      </a>
+
+      <!-- Hamburger toggle button -->
+      <button class="nav-toggle" aria-label="Toggle menu" id="navToggle">
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+      </button>
+
+      <nav class="nav-menu" id="navMenu">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/#explore">Room Styles</a></li>
+          <li><a href="/#packages">Safari & Athlete Packages</a></li>
+          <% if (user) { %>
+            <li><a href="/dashboard" class="nav-btn btn-outline">Dashboard</a></li>
+            <li><a href="/logout" class="nav-btn btn-solid">Logout</a></li>
+          <% } else { %>
+            <li><a href="/login" class="nav-btn btn-outline">Staff Portal</a></li>
+          <% } %>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  <main class="main-content">

@@ -1,0 +1,123 @@
+<%- include('header') %>
+
+<div class="dashboard-layout">
+  <%- include('sidebar') %>
+
+  <main class="dashboard-content">
+    <div class="dashboard-header-bar">
+      <div>
+        <h1>Staff Account & Privilege Manager</h1>
+        <p class="subtitle">Oversee hotel team profiles, register new employees, and manage system security access roles.</p>
+      </div>
+    </div>
+
+    <% if (error) { %>
+      <div class="alert-message error-message">
+        ⚠️ <%= error %>
+      </div>
+    <% } %>
+
+    <div class="crud-grid">
+      <!-- Left Column: Current Staff List -->
+      <div class="crud-list-panel">
+        <h3>Grand Horizon Operations Team</h3>
+        <div class="accent-bar-left"></div>
+
+        <% if (staffMembers.length === 0) { %>
+          <div class="empty-state-box">No staff profiles registered. (This state is impossible due to standard initialization).</div>
+        <% } else { %>
+          <div class="table-responsive-container">
+            <table class="responsive-table">
+              <thead>
+                <tr>
+                  <th>Employee Profile</th>
+                  <th>System Role</th>
+                  <th>Date Joined</th>
+                  <th>Adjust Roles</th>
+                  <th>Security Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% staffMembers.forEach(member => { %>
+                  <tr>
+                    <td data-label="Profile">
+                      <strong><%= member.name %></strong><br>
+                      <small><%= member.email %></small>
+                    </td>
+                    <td data-label="Role">
+                      <span class="status-pill status-<%= member.role %>"><%= member.role.toUpperCase() %></span>
+                    </td>
+                    <td data-label="Joined">
+                      <%= new Date(member.created_at).toLocaleDateString('en-KE', { dateStyle: 'medium' }) %>
+                    </td>
+                    <td data-label="Adjust Roles">
+                      <!-- Toggle role upgrade/downgrade form -->
+                      <% if (member.id !== user.id) { %>
+                        <form action="/dashboard/staff/<%= member.id %>/role" method="POST" class="inline-role-form">
+                          <select name="role" required class="select-xs">
+                            <option value="staff" <%= member.role === 'staff' ? 'selected' : '' %>>Staff Access</option>
+                            <option value="admin" <%= member.role === 'admin' ? 'selected' : '' %>>Admin Access</option>
+                          </select>
+                          <button type="submit" class="btn-solid btn-xs btn-green-add">Apply</button>
+                        </form>
+                      <% } else { %>
+                        <span class="self-label">Personal Profile</span>
+                      <% } %>
+                    </td>
+                    <td data-label="Security Action">
+                      <!-- Suspend form -->
+                      <% if (member.id !== user.id) { %>
+                        <form action="/dashboard/staff/<%= member.id %>/suspend" method="POST" class="inline-form" onsubmit="return confirm('Are you sure you want to suspend/delete the account for <%= member.name %>? This terminates their active operational session.')">
+                          <button type="submit" class="btn-solid btn-xs btn-danger">🚫 Suspend Account</button>
+                        </form>
+                      <% } else { %>
+                        <span class="lock-label">🔒 Cannot Suspend Self</span>
+                      <% } %>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- Right Column: Add New Staff Profile -->
+      <div class="crud-form-panel">
+        <div class="form-sticky-card">
+          <h3>Register Staff Profile</h3>
+          <div class="accent-bar-left"></div>
+
+          <form action="/dashboard/staff" method="POST" class="crud-main-form">
+            <div class="form-field">
+              <label for="reg_name">Employee Full Name *</label>
+              <input type="text" id="reg_name" name="name" required placeholder="e.g. Tegla Loroupe">
+            </div>
+
+            <div class="form-field">
+              <label for="reg_email">Corporate Email Address *</label>
+              <input type="email" id="reg_email" name="email" required placeholder="e.g. name@grandhorizon.co.ke">
+            </div>
+
+            <div class="form-field">
+              <label for="reg_password">Initial Portal Password *</label>
+              <input type="password" id="reg_password" name="password" required placeholder="Min 6 characters">
+            </div>
+
+            <div class="form-field">
+              <label for="reg_role">Security Role Assignment *</label>
+              <select id="reg_role" name="role" required>
+                <option value="staff" selected>Staff Operator</option>
+                <option value="admin">System Administrator</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn-solid block-btn">Register Employee</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<%- include('footer') %>

@@ -1,0 +1,38 @@
+<%- include('header') %>
+
+<div class="page-container small-container">
+  <div class="login-card">
+    <div class="login-header">
+      <span class="logo-symbol">⚜</span>
+      <h2>Grand Horizon</h2>
+      <p>Internal Operations Portal</p>
+    </div>
+
+    <% if (error) { %>
+      <div class="alert-message error-message">
+        ⚠️ <%= error %>
+      </div>
+    <% } %>
+
+    <form action="/auth/login" method="POST" class="login-form">
+      <div class="form-field">
+        <label for="email">Employee Email Address</label>
+        <input type="email" id="email" name="email" required placeholder="e.g. staff@grandhorizon.co.ke">
+      </div>
+
+      <div class="form-field">
+        <label for="password">Security Password</label>
+        <input type="password" id="password" name="password" required placeholder="••••••••">
+      </div>
+
+      <button type="submit" class="btn-solid login-submit-btn">Authorize & Log In</button>
+    </form>
+
+    <div class="login-footer">
+      <p>Authorized personnel only. Sessions are fully audited under East Africa Time (EAT).</p>
+      <a href="/" class="back-link">← Back to Public Website</a>
+    </div>
+  </div>
+</div>
+
+<%- include('footer') %>

@@ -1,0 +1,275 @@
+<%- include('header') %>
+
+<div class="dashboard-layout">
+  
+  <!-- Sidebar Navigation -->
+  <%- include('sidebar') %>
+
+  <!-- Main Dashboard Content Panel -->
+  <main class="dashboard-content">
+    
+    <div class="dashboard-header-bar">
+      <div>
+        <h1>Operational Staff Desk</h1>
+        <p class="subtitle">Managing Today's Arrivals, Departures, and Active Stays. (East Africa Time - EAT)</p>
+      </div>
+      <div class="date-badge">📅 Today: <%= todayStr %></div>
+    </div>
+
+    <!-- Quick Stats Cards -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <span class="stat-icon">📥</span>
+        <div class="stat-info">
+          <span class="stat-value"><%= todayArrivals.length %></span>
+          <span class="stat-label">Pending Arrivals Today</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">📤</span>
+        <div class="stat-info">
+          <span class="stat-value"><%= todayDepartures.length %></span>
+          <span class="stat-label">Departures Due Today</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">🔑</span>
+        <div class="stat-info">
+          <span class="stat-value"><%= activeStays.length %></span>
+          <span class="stat-label">Active Guests Checked-In</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 1: Today's Arrivals (Pending Check-In) -->
+    <section class="dashboard-section">
+      <h3>📥 Today's Arrivals</h3>
+      <div class="accent-bar-left"></div>
+      
+      <% if (todayArrivals.length === 0) { %>
+        <div class="empty-state-box">No pending arrivals scheduled for today.</div>
+      <% } else { %>
+        <div class="table-responsive-container">
+          <table class="responsive-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Guest Details</th>
+                <th>Room Info</th>
+                <th>Dates</th>
+                <th>Price</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% todayArrivals.forEach(b => { %>
+                <tr>
+                  <td data-label="Code"><strong class="conf-code-badge"><%= b.confirmation_code %></strong></td>
+                  <td data-label="Guest">
+                    <strong><%= b.guest_name %></strong><br>
+                    <small><%= b.guest_email %> | <%= b.guest_phone %></small>
+                  </td>
+                  <td data-label="Room">Room <%= b.room_number %> (Floor <%= b.floor %>)</td>
+                  <td data-label="Dates">Out: <%= b.check_out_date.toISOString().split('T')[0] %></td>
+                  <td data-label="Price">KES <%= parseFloat(b.total_price_kes).toLocaleString() %></td>
+                  <td data-label="Action">
+                    <form action="/dashboard/bookings/<%= b.id %>/status" method="POST" class="inline-form">
+                      <input type="hidden" name="status" value="Checked-In">
+                      <button type="submit" class="btn-solid btn-sm check-in-btn">🔑 Check In</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </section>
+
+    <!-- Section 2: Today's Departures (Checked-In due to leave today) -->
+    <section class="dashboard-section">
+      <h3>📤 Today's Departures</h3>
+      <div class="accent-bar-left"></div>
+      
+      <% if (todayDepartures.length === 0) { %>
+        <div class="empty-state-box">No departures scheduled for today.</div>
+      <% } else { %>
+        <div class="table-responsive-container">
+          <table class="responsive-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Guest Details</th>
+                <th>Room Info</th>
+                <th>Dates</th>
+                <th>Price</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% todayDepartures.forEach(b => { %>
+                <tr>
+                  <td data-label="Code"><strong class="conf-code-badge"><%= b.confirmation_code %></strong></td>
+                  <td data-label="Guest">
+                    <strong><%= b.guest_name %></strong><br>
+                    <small><%= b.guest_email %></small>
+                  </td>
+                  <td data-label="Room">Room <%= b.room_number %></td>
+                  <td data-label="Dates">In: <%= b.check_in_date.toISOString().split('T')[0] %></td>
+                  <td data-label="Price">KES <%= parseFloat(b.total_price_kes).toLocaleString() %></td>
+                  <td data-label="Action">
+                    <form action="/dashboard/bookings/<%= b.id %>/status" method="POST" class="inline-form">
+                      <input type="hidden" name="status" value="Checked-Out">
+                      <button type="submit" class="btn-solid btn-sm btn-gold check-out-btn">📤 Check Out</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </section>
+
+    <!-- Section 3: Active Guest Stays & Add Services Option -->
+    <section class="dashboard-section">
+      <h3>🔑 Active Guest Stays (Currently Checked-In)</h3>
+      <div class="accent-bar-left"></div>
+      
+      <% if (activeStays.length === 0) { %>
+        <div class="empty-state-box">No guests are currently checked into the hotel.</div>
+      <% } else { %>
+        <div class="table-responsive-container">
+          <table class="responsive-table">
+            <thead>
+              <tr>
+                <th>Room / Guest</th>
+                <th>Check-In / Out Dates</th>
+                <th>Bill Summary</th>
+                <th>Add Hotel Service Package</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% activeStays.forEach(b => { %>
+                <tr>
+                  <td data-label="Room / Guest">
+                    <strong>Room <%= b.room_number %></strong><br>
+                    <span><%= b.guest_name %></span> <br>
+                    <small class="conf-code-badge"><%= b.confirmation_code %></small>
+                  </td>
+                  <td data-label="Dates">
+                    In: <%= b.check_in_date.toISOString().split('T')[0] %><br>
+                    Out: <%= b.check_out_date.toISOString().split('T')[0] %>
+                  </td>
+                  <td data-label="Bill">
+                    <strong>KES <%= parseFloat(b.total_price_kes).toLocaleString() %></strong>
+                  </td>
+                  <td data-label="Add Service">
+                    <!-- Dynamic service adder form -->
+                    <form action="/dashboard/bookings/<%= b.id %>/add-service" method="POST" class="add-service-inline-form">
+                      <select name="service_id" required class="select-sm">
+                        <option value="" disabled selected>Select Service...</option>
+                        <% services.forEach(s => { %>
+                          <option value="<%= s.id %>">
+                            <%= s.service_name %> (KES <%= parseFloat(s.price_kes).toLocaleString() %>)
+                          </option>
+                        <% }) %>
+                      </select>
+                      <div class="qty-add-row">
+                        <input type="number" name="quantity" value="1" min="1" required class="input-sm qty-input">
+                        <button type="submit" class="btn-solid btn-sm btn-green-add">＋ Add</button>
+                      </div>
+                    </form>
+                  </td>
+                  <td data-label="Action">
+                    <form action="/dashboard/bookings/<%= b.id %>/status" method="POST" class="inline-form">
+                      <input type="hidden" name="status" value="Checked-Out">
+                      <button type="submit" class="btn-solid btn-sm btn-gold check-out-btn">📤 Check Out</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </section>
+
+    <!-- Section 4: Stay Tracker Master Table (All Bookings History) -->
+    <section class="dashboard-section">
+      <h3>📋 Stay Tracker (All Reservations)</h3>
+      <div class="accent-bar-left"></div>
+      
+      <% if (bookings.length === 0) { %>
+        <div class="empty-state-box">No reservations are currently recorded in the database.</div>
+      <% } else { %>
+        <div class="table-responsive-container">
+          <table class="responsive-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Guest</th>
+                <th>Dates</th>
+                <th>Total Bill</th>
+                <th>Status</th>
+                <th>System Operations</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% bookings.forEach(b => { %>
+                <tr>
+                  <td data-label="Code"><strong class="conf-code-badge"><%= b.confirmation_code %></strong></td>
+                  <td data-label="Guest">
+                    <strong><%= b.guest_name %></strong><br>
+                    <small>Room <%= b.room_number %></small>
+                  </td>
+                  <td data-label="Dates">
+                    <%= b.check_in_date.toISOString().split('T')[0] %> to <%= b.check_out_date.toISOString().split('T')[0] %>
+                  </td>
+                  <td data-label="Total Bill">KES <%= parseFloat(b.total_price_kes).toLocaleString() %></td>
+                  <td data-label="Status">
+                    <span class="status-pill <%= b.status.toLowerCase() %>"><%= b.status %></span>
+                  </td>
+                  <td data-label="Operations">
+                    <div class="operation-buttons-row">
+                      <% if (b.status === 'Pending') { %>
+                        <form action="/dashboard/bookings/<%= b.id %>/status" method="POST" class="inline-form">
+                          <input type="hidden" name="status" value="Confirmed">
+                          <button type="submit" class="btn-outline btn-xs">Confirm</button>
+                        </form>
+                        <form action="/dashboard/bookings/<%= b.id %>/status" method="POST" class="inline-form">
+                          <input type="hidden" name="status" value="Cancelled">
+                          <button type="submit" class="btn-outline btn-xs btn-danger">Cancel</button>
+                        </form>
+                      <% } else if (b.status === 'Confirmed') { %>
+                        <form action="/dashboard/bookings/<%= b.id %>/status" method="POST" class="inline-form">
+                          <input type="hidden" name="status" value="Checked-In">
+                          <button type="submit" class="btn-solid btn-xs btn-green-add">Check-In</button>
+                        </form>
+                        <form action="/dashboard/bookings/<%= b.id %>/status" method="POST" class="inline-form">
+                          <input type="hidden" name="status" value="Cancelled">
+                          <button type="submit" class="btn-outline btn-xs btn-danger">Cancel</button>
+                        </form>
+                      <% } else if (b.status === 'Checked-In') { %>
+                        <form action="/dashboard/bookings/<%= b.id %>/status" method="POST" class="inline-form">
+                          <input type="hidden" name="status" value="Checked-Out">
+                          <button type="submit" class="btn-solid btn-xs btn-gold">Check-Out</button>
+                        </form>
+                      <% } else { %>
+                        <span class="no-op-text">—</span>
+                      <% } %>
+                    </div>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </section>
+
+  </main>
+</div>
+
+<%- include('footer') %>

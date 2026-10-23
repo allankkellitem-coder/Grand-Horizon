@@ -1,0 +1,122 @@
+<%- include('header') %>
+
+<!-- Luxury Hero Section -->
+<section class="hero-section">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <span class="hero-badge">Welcome to Eldoret's Premier Boutique Stay</span>
+    <h1>Experience Elite High-Altitude Luxury</h1>
+    <p>Where world-class running champions train, and premium luxury hospitality meets authentic Kenyan warmth.</p>
+    <a href="#booking-console" class="hero-btn">Reserve Your Stay</a>
+  </div>
+</section>
+
+<!-- Main Date-Search Console -->
+<section class="booking-console-container" id="booking-console">
+  <div class="console-box">
+    <h3>Check Real-Time Availability</h3>
+    
+    <% if (error) { %>
+      <div class="alert-message error-message">
+        ⚠️ <%= error %>
+      </div>
+    <% } %>
+
+    <form action="/search" method="GET" class="search-form">
+      <div class="form-group-row">
+        <div class="input-container">
+          <label for="checkIn">Check-In Date</label>
+          <input type="date" id="checkIn" name="checkIn" required>
+        </div>
+        <div class="input-container">
+          <label for="checkOut">Check-Out Date</label>
+          <input type="date" id="checkOut" name="checkOut" required>
+        </div>
+        <button type="submit" class="search-submit-btn">Search Available Rooms</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- Room Styles Showcase -->
+<section class="showcase-section" id="explore">
+  <div class="section-header">
+    <h2>Our Curated Guest Cabins & Suites</h2>
+    <div class="accent-bar"></div>
+    <p>Each suite is meticulously designed with rich earth colors, fine mahogany finishes, and local artisan accents.</p>
+  </div>
+
+  <div class="categories-grid">
+    <% categories.forEach(cat => { %>
+      <div class="category-card">
+        <div class="card-image-fallback">
+          <% if (cat.name.includes('Athlete')) { %>
+            🏃‍♂️ High-Altitude Cabin
+          <% } else if (cat.name.includes('Business')) { %>
+            💼 Executive Business
+          <% } else if (cat.name.includes('Safari')) { %>
+            🦁 Deluxe Safari Room
+          <% } else { %>
+            🛏️ Twin Bed Comfort
+          <% } %>
+        </div>
+        <div class="category-card-content">
+          <h3><%= cat.name %></h3>
+          <p class="category-price">From <strong class="currency">KES <%= parseFloat(cat.base_price_kes).toLocaleString() %></strong> <span class="per-night">/ night</span></p>
+          <p class="category-description"><%= cat.description %></p>
+          <div class="category-features">
+            <span>✓ Default East Africa Time (EAT)</span>
+            <span>✓ High-speed Fiber Wi-Fi</span>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</section>
+
+<!-- Local Eldoret Packages & Add-ons -->
+<section class="packages-section" id="packages">
+  <div class="section-header">
+    <h2>Premium Local Add-on Experiences</h2>
+    <div class="accent-bar"></div>
+    <p>Enhance your Eldoret stay with authentic local culinary, corporate, or high-performance athletic services.</p>
+  </div>
+
+  <div class="services-list-grid">
+    <% services.forEach(serv => { %>
+      <div class="service-card">
+        <div class="service-icon-box">
+          <% if (serv.service_name.includes('Airport')) { %>
+            ✈️
+          <% } else if (serv.service_name.includes('Gym')) { %>
+            🏋️‍♂️
+          <% } else if (serv.service_name.includes('Dinner')) { %>
+            🥣
+          <% } else if (serv.service_name.includes('County')) { %>
+            🏢
+          <% } else { %>
+            ☕
+          <% } %>
+        </div>
+        <div class="service-body">
+          <h4><%= serv.service_name %></h4>
+          <p class="service-desc"><%= serv.description %></p>
+          <span class="service-tag">KES <%= parseFloat(serv.price_kes).toLocaleString() %></span>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</section>
+
+<!-- Eldoret High-Altitude running culture banner -->
+<section class="culture-banner">
+  <div class="culture-overlay"></div>
+  <div class="culture-content">
+    <h2>Eldoret: Home of Running Champions</h2>
+    <p>
+      Situated 2,100 meters above sea level in Uasin Gishu County, Eldoret provides the perfect high-altitude atmosphere for top-tier endurance training. Grand Horizon is honored to support marathon legends, local running teams, and traveling sports enthusiasts. Enjoy fresh local **Mursik** with your recovery meals!
+    </p>
+  </div>
+</section>
+
+<%- include('footer') %>

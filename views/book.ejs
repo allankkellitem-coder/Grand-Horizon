@@ -1,0 +1,133 @@
+<%- include('header') %>
+
+<div class="page-container">
+  <div class="booking-layout-grid">
+    
+    <!-- Left Column: Checkout Guest Details Form -->
+    <div class="booking-form-panel">
+      <h2>Complete Your Reservation</h2>
+      <div class="accent-bar-left"></div>
+
+      <form action="/book" method="POST" id="checkoutForm" class="checkout-form">
+        <!-- Hidden Room Details -->
+        <input type="hidden" name="room_id" value="<%= room.id %>">
+        <input type="hidden" name="checkIn" value="<%= checkIn %>">
+        <input type="hidden" name="checkOut" value="<%= checkOut %>">
+
+        <div class="form-section-title">Guest Contact Information</div>
+        
+        <div class="form-field">
+          <label for="guest_name">Full Name (as in ID/Passport) *</label>
+          <input type="text" id="guest_name" name="guest_name" required placeholder="e.g. Kipchoge Keino">
+        </div>
+
+        <div class="form-row-two">
+          <div class="form-field">
+            <label for="guest_email">Email Address *</label>
+            <input type="email" id="guest_email" name="guest_email" required placeholder="e.g. kipchoge@example.com">
+          </div>
+          <div class="form-field">
+            <label for="guest_phone">Phone Number *</label>
+            <input type="tel" id="guest_phone" name="guest_phone" required placeholder="e.g. +254 712 345678">
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="guest_id_passport">National ID / Passport Number *</label>
+          <input type="text" id="guest_id_passport" name="guest_id_passport" required placeholder="Enter ID or passport number">
+        </div>
+
+        <div class="form-section-title">Select Premium Add-on Services (Optional)</div>
+        <p class="section-hint">Select any of our localized services to enjoy a complete Grand Horizon resort stay.</p>
+
+        <div class="services-checklist">
+          <% services.forEach(serv => { %>
+            <div class="service-check-row" data-price="<%= serv.price_kes %>" data-id="<%= serv.id %>">
+              <div class="service-check-left">
+                <input type="checkbox" name="services" value="<%= serv.id %>" id="service_<%= serv.id %>" class="service-checkbox">
+                <label for="service_<%= serv.id %>">
+                  <span class="service-check-name"><%= serv.service_name %></span>
+                  <span class="service-check-desc"><%= serv.description %></span>
+                </label>
+              </div>
+              <div class="service-check-right">
+                <span class="service-unit-price">KES <%= parseFloat(serv.price_kes).toLocaleString() %></span>
+                <div class="service-qty-box">
+                  <label for="qty_service_<%= serv.id %>">Qty:</label>
+                  <input type="number" name="qty_service_<%= serv.id %>" id="qty_service_<%= serv.id %>" class="service-qty-input" value="1" min="1" disabled>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+
+        <button type="submit" class="btn-solid submit-booking-btn">Confirm Reservation & Lock Room</button>
+      </form>
+    </div>
+
+    <!-- Right Column: Stay & Pricing Summary Panel -->
+    <div class="booking-summary-panel">
+      <div class="summary-sticky-card">
+        <h3>Stay Summary</h3>
+        <div class="summary-room-badge">
+          ⚜ Room <%= room.room_number %> — Floor <%= room.floor %>
+        </div>
+        
+        <table class="summary-table">
+          <tr>
+            <td>Category:</td>
+            <td class="text-right"><strong><%= room.category_name %></strong></td>
+          </tr>
+          <tr>
+            <td>Check-In:</td>
+            <td class="text-right"><%= new Date(checkIn).toLocaleDateString('en-KE', { dateStyle: 'medium' }) %></td>
+          </tr>
+          <tr>
+            <td>Check-Out:</td>
+            <td class="text-right"><%= new Date(checkOut).toLocaleDateString('en-KE', { dateStyle: 'medium' }) %></td>
+          </tr>
+          <tr>
+            <td>Duration:</td>
+            <td class="text-right"><%= nights %> <%= nights === 1 ? 'Night' : 'Nights' %></td>
+          </tr>
+          <tr>
+            <td>Base rate:</td>
+            <td class="text-right">KES <%= parseFloat(room.base_price_kes).toLocaleString() %> / night</td>
+          </tr>
+        </table>
+
+        <div class="summary-divider"></div>
+
+        <div class="price-breakdown-live">
+          <div class="price-line">
+            <span>Room Base Charge (<%= nights %> nights)</span>
+            <span id="summary-room-total" data-base="<%= parseFloat(room.base_price_kes) * nights %>">
+              KES <%= (parseFloat(room.base_price_kes) * nights).toLocaleString() %>
+            </span>
+          </div>
+          <div class="price-line">
+            <span>Selected Service Add-ons</span>
+            <span id="summary-services-total">KES 0</span>
+          </div>
+          
+          <div class="summary-divider"></div>
+          
+          <div class="grand-total-display">
+            <span>Grand Total (KES)</span>
+            <span class="total-kes-number" id="live-total-kes">
+              KES <%= (parseFloat(room.base_price_kes) * nights).toLocaleString() %>
+            </span>
+          </div>
+        </div>
+
+        <p class="vat-notice">All prices are shown natively in Kenyan Shillings (KES) and default to East Africa Time (EAT).</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Dynamic Price Calculations Script -->
+<script src="/js/booking.js"></script>
+
+<%- include('footer') %>

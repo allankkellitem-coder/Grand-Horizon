@@ -1,0 +1,55 @@
+<aside class="dashboard-sidebar">
+  <div class="sidebar-profile">
+    <div class="avatar">👤</div>
+    <div class="profile-info">
+      <span class="profile-name"><%= user.name %></span>
+      <span class="profile-role badge-role <%= user.role %>"><%= user.role.toUpperCase() %></span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <ul>
+      <li>
+        <a href="/dashboard" class="sidebar-link">
+          <span class="icon">📋</span> Staff Stay Tracker
+        </a>
+      </li>
+      
+      <% if (user.role === 'admin') { %>
+        <li class="nav-divider">Admin Master Control</li>
+        <li>
+          <a href="/dashboard/categories" class="sidebar-link">
+            <span class="icon">🏷️</span> Inventory Categories
+          </a>
+        </li>
+        <li>
+          <a href="/dashboard/rooms" class="sidebar-link">
+            <span class="icon">🔑</span> Hotel Rooms CRUD
+          </a>
+        </li>
+        <li>
+          <a href="/dashboard/services" class="sidebar-link">
+            <span class="icon">🛎️</span> Add-on Services CRUD
+          </a>
+        </li>
+        <li>
+          <a href="/dashboard/staff" class="sidebar-link">
+            <span class="icon">👥</span> Staff Account Manager
+          </a>
+        </li>
+      <% } %>
+
+      <li class="nav-divider">System</li>
+      <li>
+        <a href="/" class="sidebar-link">
+          <span class="icon">🌐</span> Public Website
+        </a>
+      </li>
+      <li>
+        <a href="/auth/logout" class="sidebar-link logout-link">
+          <span class="icon">🚪</span> Portal Logout
+        </a>
+      </li>
+    </ul>
+  </nav>
+</aside>
